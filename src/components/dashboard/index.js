@@ -1,6 +1,7 @@
-import { Fragment } from 'react'
+import { Fragment, useEffect } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { useNavigate } from 'react-router-dom'
 
 const user = {
   name: 'Tom Cook',
@@ -8,6 +9,7 @@ const user = {
   imageUrl:
     'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
 }
+// TODO:Adicionar uma função de checagem para ver se o usuário é superadmin 
 const navigation = [
   { name: 'Dashboard', href: '#', current: true },
   { name: 'Team', href: '#', current: false },
@@ -15,10 +17,11 @@ const navigation = [
   { name: 'Calendar', href: '#', current: false },
   { name: 'Reports', href: '#', current: false },
 ]
+// TODO:Adicionar links no menu do perfil
 const userNavigation = [
-  { name: 'Your Profile', href: '#' },
-  { name: 'Settings', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Seu Perfil', href: '#' },
+  { name: 'Configurações', href: '#' },
+  { name: 'Logout', href: '#' },
 ]
 
 function classNames(...classes) {
@@ -26,6 +29,28 @@ function classNames(...classes) {
 }
 
 export default function Dashboard() {
+  const navigate  = useNavigate();
+
+  useEffect(() => {
+    const checkLoggedInUser = async () => {
+      const loggedInUser = localStorage.getItem('user');
+      if (loggedInUser) {
+        const user = JSON.parse(loggedInUser);
+        const { timestamp } = user;
+        const timeElapsed = Date.now() - timestamp;
+        const minutesElapsed = Math.floor(timeElapsed / (1000 * 60));
+        if (minutesElapsed >= 10) {
+          localStorage.removeItem('user');
+          navigate('/login');
+        }
+      } else {
+        localStorage.removeItem('user');
+        navigate('/login');
+      }
+    };
+    checkLoggedInUser();
+  }, [navigate]);
+
   return (
     <>
       {/*

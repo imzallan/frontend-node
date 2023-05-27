@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -6,6 +6,23 @@ export default function LoginForm() {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
+  // Persistencia de login
+  useEffect(() => {
+    const checkLoggedInUser = async () => {
+      const loggedInUser = localStorage.getItem('user');
+      if (loggedInUser) {
+        const user = JSON.parse(loggedInUser);
+        const { timestamp } = user;
+        const timeElapsed = Date.now() - timestamp;
+        const minutesElapsed = Math.floor(timeElapsed / (1000 * 60));
+        if (minutesElapsed <= 10) {
+          navigate('/dashboard');
+        }
+      }
+    };
+    checkLoggedInUser();
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,9 +33,13 @@ export default function LoginForm() {
         username: username,
         password: password
       });
-
       // Verifica se o login foi bem-sucedido
       if (response.data.success) {
+        const user = {
+          username: username,
+          timestamp: Date.now()
+        };
+        localStorage.setItem('user', JSON.stringify(user));
         // Lógica para redirecionar para a próxima página ou exibir uma mensagem de sucesso
         navigate('/dashboard');
         console.log('Login bem-sucedido!');
@@ -80,9 +101,9 @@ export default function LoginForm() {
                     Password
                   </label>
                   <div className="text-sm">
-                    <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                    <button className="font-semibold text-indigo-600 hover:text-indigo-500">
                       Forgot password?
-                    </a>
+                    </button>
                   </div>
                 </div>
                 <div className="mt-2">
@@ -111,9 +132,9 @@ export default function LoginForm() {
   
             <p className="mt-10 text-center text-sm text-gray-500">
               Not a member?{' '}
-              <a href="#" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+              <button className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
                 Start a 14 day free trial
-              </a>
+              </button>
             </p>
           </div>
         </div>

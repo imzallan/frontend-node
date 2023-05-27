@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { faker } from '@faker-js/faker';
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
@@ -19,9 +18,9 @@ const UserList = () => {
   }, []);
 
   const people = users.map((user) => ({
-    name: user.username,
+    name: user.name,
     role: user.role,
-    imageUrl: faker.image.avatar(),
+    imageUrl: user.photo
   }));
 
   return (
